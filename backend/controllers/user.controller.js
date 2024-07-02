@@ -72,27 +72,83 @@ export const verifyEmail = async (req, res) => {
   })
 }
 
-// resend email verification token
-/*
- * @body {email}
- * check if user exists in database
- * if email is already veiried send message to user that email is already verified
- * generate new token and expiry date
- * update user record with new token and expiry date in database
- * send email with new token
- */
+export const resendEmailVerificationToken = async (req, res) => {
+  const { email } = req.body
+  const user = await findUser({ email })
+  if (user.emailVerified) {
+    throw new BadRequestError('Email is already verified')
+  }
+  const emailVerificationToken = await generateRandomToken()
+  const emailVerificationExpires = addExpiryHours()
 
-// send password reset token
-/*
- * @body {email}
- * check if user exists in database
- * if email is already veiried send message to user that email is already verified
- * generate new token and expiry date
- * update user record with new token and expiry date in database
- * send email with new token
- */
+  user.emailVerificationToken = emailVerificationToken
+  user.emailVerificationExpires = emailVerificationExpires
+  await user.save()
 
-// reset password
+  const mailOptions = {
+    from: 'admin@blog.com',
+    to: user.email,
+    subject: 'Email Verification',
+    template: 'emailVerify',
+    context: {
+      fullName: user.fullName,
+      url: `${process.env.CLIENT_URL}/verify-email/${user.emailVerificationToken}`,
+    },
+  }
+
+  await sendMail(mailOptions)
+
+  return res.status(200).json({
+    message: 'Email verification token resent successfully',
+  })
+}
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body
+  const user = await findUser({ email })
+
+  const passwordResetToken = await generateRandomToken()
+  const passwordResetExpires = addExpiryHours()
+
+  user.passwordResetToken = passwordResetToken
+  user.passwordResetExpires = passwordResetExpires
+  await user.save()
+
+  const mailOptions = {
+    from: 'admin@blog.com',
+    to: user.email,
+    subject: 'Reset Your Password',
+    template: 'resetPassword',
+    context: {
+      fullName: user.fullName,
+      url: `${process.env.CLIENT_URL}/reset-password/${user.emailVerificationToken}`,
+    },
+  }
+
+  await sendMail(mailOptions)
+
+  return res.status(200).json({
+    message: 'Password reset token sent successfully',
+  })
+}
+
+export const resetPassword = async (req, res) => {
+  const { password, confirmPassword } = req.body
+
+  if (password !== confirmPassword) {
+    throw new BadRequestError('Passwords do not match')
+  }
+
+  const token = req.params.token
+  const user = await findUser({ passwordResetToken: token })
+
+  user.password = password
+  user.passwordResetToken = ''
+  user.passwordResetExpires = null
+  await user.save()
+
+  return res.status(200).json({ message: 'Password reset successfully' })
+}
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body
