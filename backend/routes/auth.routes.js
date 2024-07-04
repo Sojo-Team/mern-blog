@@ -6,7 +6,7 @@ import {
   resendEmailVerificationToken,
   resetPassword,
   verifyEmail,
-} from '../controllers/user.controller.js'
+} from '../controllers/auth.controller.js'
 import {
   loginUserValidator,
   registerUserValidator,
