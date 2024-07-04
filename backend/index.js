@@ -28,6 +28,7 @@ app.all('*', (req, res) => {
 app.use((error, _req, res, next) => {
   if (error instanceof CustomError) {
     return res.status(error.statusCode).json(error.serializeErrors())
+    next()
   }
   next()
 })

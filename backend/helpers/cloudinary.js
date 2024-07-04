@@ -16,3 +16,12 @@ export function uploadImage(file) {
     streamifier.createReadStream(file.buffer).pipe(stream)
   })
 }
+
+export function deleteImage(publicId) {
+  return new Promise((resolve, reject) => {
+    cloudinary.v2.uploader.destroy(publicId, (error, result) => {
+      if (error) reject(error)
+      resolve(result)
+    })
+  })
+}
