@@ -9,8 +9,8 @@ const blogSchema = new Schema({
     publicId: { type: String, default: '' },
     url: { type: String, default: '' },
   },
-  likesCount: { type: String, default: 0 },
-  commentCount: { type: String, default: 0 },
+  likesCount: { type: Number, default: 0 },
+  commentCount: { type: Number, default: 0 },
   likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 })
 

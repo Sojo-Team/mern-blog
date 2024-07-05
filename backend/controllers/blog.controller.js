@@ -116,3 +116,44 @@ export const fetchSingleBlog = async (req, res) => {
     throw new BadRequestError('Error fetching blog')
   }
 }
+
+/*
+page = 1
+skip = 0
+page = 2
+skip = (page - 1) * limit
+*/
+
+// Blog is awesome
+// awesome
+
+export const fetchBlogs = async (req, res) => {
+  try {
+    const search = req.query.search || ''
+    const page = +req.query.page || 1
+    const limit = +req.query.limit || 5
+
+    const skip = (page - 1) * limit
+
+    const query = { title: { $regex: search, $options: 'i' } }
+
+    const blogs = await BlogModel.find(query)
+      .skip(skip)
+      .limit(limit)
+      .populate('author', 'email profilePicture firstName lastName')
+
+    const total = await BlogModel.countDocuments(query)
+
+    const totalPages = Math.ceil(total / limit)
+
+    return res.status(200).json({
+      blogs,
+      total,
+      page,
+      totalPages,
+    })
+  } catch (error) {
+    console.log(error)
+    throw new BadRequestError('Error fetching blogs')
+  }
+}
