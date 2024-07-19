@@ -4,7 +4,7 @@ import { BlogModel } from '../models/blog.model.js'
 import { findBlogById } from '../services/blog.service.js'
 
 export const createBlog = async (req, res) => {
-  const { title, content, tags } = req.body
+  const { title, content, tags, shortDescription } = req.body
 
   if (!req.file) {
     throw new BadRequestError('Cover image is required')
@@ -19,6 +19,7 @@ export const createBlog = async (req, res) => {
     title,
     content,
     tags,
+    shortDescription,
     author: req.user.id,
     coverImage: {
       publicId: result.public_id,
@@ -36,7 +37,7 @@ export const createBlog = async (req, res) => {
 
 export const updateBlog = async (req, res) => {
   try {
-    const { title, content, tags } = req.body
+    const { title, content, tags, shortDescription } = req.body
     const blog = await findBlogById(req.params.id)
 
     if (blog.author.toString() !== req.user.id) {
@@ -62,6 +63,7 @@ export const updateBlog = async (req, res) => {
         $set: {
           title,
           content,
+          shortDescription,
           tags,
           ...(imageResult && {
             coverImage: {
@@ -139,6 +141,7 @@ export const fetchBlogs = async (req, res) => {
 
     const blogs = await BlogModel.find(query)
       .skip(skip)
+      .sort({ createdAt: -1 })
       .limit(limit)
       .populate('author', 'email profilePicture firstName lastName')
 

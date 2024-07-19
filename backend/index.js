@@ -1,5 +1,6 @@
 import compression from 'compression'
 import express from 'express'
+import cors from 'cors'
 import mongoose from 'mongoose'
 import 'dotenv/config'
 import 'express-async-errors'
@@ -9,6 +10,11 @@ import routes from './routes/index.js'
 
 const app = express()
 
+app.use(
+  cors({
+    origin: [process.env.CLIENT_URL],
+  })
+)
 app.use(express.json({ limit: '50mb' }))
 app.use(express.urlencoded({ extended: false, limit: '50mb' }))
 app.use(compression())
@@ -40,9 +46,3 @@ mongoose
 app.listen(process.env.PORT, () => {
   console.log(`Server running at port ${process.env.PORT}`)
 })
-
-/**
- * (error,req,res,next) => {
- * }
- *
- */
