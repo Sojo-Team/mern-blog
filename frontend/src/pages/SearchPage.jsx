@@ -1,15 +1,16 @@
 import BlogCard from '@/components/blogs/BlogCard'
 import Header from '@/components/common/Header'
 import { fetchBlogsService } from '@/services/blog.service'
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { useSearchParams } from 'react-router-dom'
 
-const HomePage = () => {
-  const queryClient = useQueryClient()
+const SearchPage = () => {
   const [searchParams] = useSearchParams()
   const { ref, inView } = useInView()
+
+  console.log(searchParams.get('q'))
 
   const { data, hasNextPage, fetchNextPage, isLoading } = useInfiniteQuery({
     queryKey: ['blogs'],
@@ -28,15 +29,6 @@ const HomePage = () => {
       pages: data.pages.flat().map(page => page.blogs),
     }),
   })
-
-  console.log('InView', inView)
-  console.log(hasNextPage)
-
-  useEffect(() => {
-    if (searchParams.get('q')) {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] })
-    }
-  }, [searchParams])
 
   useEffect(() => {
     if (hasNextPage) {
@@ -67,4 +59,4 @@ const HomePage = () => {
     </div>
   )
 }
-export default HomePage
+export default SearchPage

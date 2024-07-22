@@ -5,10 +5,13 @@ import AuthLayout from './layouts/AdminLayout'
 import AdminLayout from './layouts/AdminLayout'
 
 const HomePage = lazy(() => import('./pages/HomePage'))
+const SearchPage = lazy(() => import('./pages/SearchPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const RegisterPage = lazy(() => import('./pages/RegisterPage'))
 const NotifyEmailPage = lazy(() => import('./pages/NotifyEmail'))
 const VerifyEmailPage = lazy(() => import('./pages/VerifyEmail'))
+
+const SingleBlogPage = lazy(() => import('./pages/SingleBlogPage'))
 
 // Admin Pages
 const AdminCreateBlogPage = lazy(() => import('./pages/admin/CreateBlogPage'))
@@ -26,6 +29,10 @@ const App = () => {
             element={<HomePage />}
           />
           <Route
+            path='/search'
+            element={<SearchPage />}
+          />
+          <Route
             path='/login'
             element={<LoginPage />}
           />
@@ -40,6 +47,11 @@ const App = () => {
           <Route
             path='/verify-email/:token'
             element={<VerifyEmailPage />}
+          />
+
+          <Route
+            path='/blog/:blogId'
+            element={<SingleBlogPage />}
           />
 
           <Route

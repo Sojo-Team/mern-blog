@@ -12,13 +12,25 @@ export const createBlogService = async value => {
   }
 }
 
-export const fetchBlogsService = async page => {
+export const fetchBlogsService = async (page, search = '') => {
   try {
     const response = await api.get('/blog', {
       params: {
         page,
+        search,
       },
     })
+    return response.data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw error.response.data.message
+    }
+  }
+}
+
+export const fetchSingleBlogService = async id => {
+  try {
+    const response = await api.get(`/blog/${id}`)
     return response.data
   } catch (error) {
     if (isAxiosError(error)) {
