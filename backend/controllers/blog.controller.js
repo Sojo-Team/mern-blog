@@ -1,6 +1,7 @@
 import { deleteImage, uploadImage } from '../helpers/cloudinary.js'
 import { BadRequestError, UnauthorizedError } from '../helpers/error-handler.js'
 import { BlogModel } from '../models/blog.model.js'
+import { CommentModel } from '../models/comment.model.js'
 import { findBlogById } from '../services/blog.service.js'
 
 export const createBlog = async (req, res) => {
@@ -119,16 +120,6 @@ export const fetchSingleBlog = async (req, res) => {
   }
 }
 
-/*
-page = 1
-skip = 0
-page = 2
-skip = (page - 1) * limit
-*/
-
-// Blog is awesome
-// awesome
-
 export const fetchBlogs = async (req, res) => {
   try {
     const search = req.query.search || ''
@@ -160,3 +151,57 @@ export const fetchBlogs = async (req, res) => {
     throw new BadRequestError('Error fetching blogs')
   }
 }
+
+// 1 user = liked
+// 1 user = liked
+// 1 user = disliked
+export const likeBlog = async (req, res) => {
+  const blog = await findBlogById(req.params.id)
+
+  const isAlreadyLiked = blog.likes.includes(req.user.id)
+
+  const updatedBlog = await BlogModel.findOneAndUpdate(
+    { _id: req.params.id },
+
+    isAlreadyLiked
+      ? {
+          $inc: { likesCount: -1 },
+          $pull: { likes: req.user.id },
+        }
+      : { $inc: { likesCount: 1 }, $push: { likes: req.user.id } }
+  )
+
+  res.status(200).json(updatedBlog)
+}
+
+export const createComment = async (req, res) => {
+  const { content } = req.body
+
+  const blog = await findBlogById(req.params.id)
+
+  const comment = await CommentModel.create({
+    content,
+    author: req.user.id,
+    blog: blog._id,
+  })
+
+  await BlogModel.findOneAndUpdate(
+    { _id: req.params.id },
+    {
+      $inc: {
+        commentCount: 1,
+      },
+    }
+  )
+
+  return res.status(201).json({
+    message: 'Comment created successfully',
+    comment,
+  })
+}
+
+/**
+ * READ => Also populate the author of the comment
+ * UPDATE => Only update your blog
+ * DELTE => Only delete your blog
+ */
