@@ -38,3 +38,14 @@ export const fetchSingleBlogService = async id => {
     }
   }
 }
+
+export const addLiketoBlog = async id => {
+  try {
+    const response = await api.put(`/blog/like/${id}`)
+    return response.data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw error.response.data.message
+    }
+  }
+}
