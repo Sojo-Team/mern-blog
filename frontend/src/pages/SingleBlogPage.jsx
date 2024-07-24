@@ -1,12 +1,17 @@
 import Header from '@/components/common/Header'
-import { addLiketoBlog, fetchSingleBlogService } from '@/services/blog.service'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  addComment,
+  addLiketoBlog,
+  fetchSingleBlogService,
+} from '@/services/blog.service'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { Parser } from 'html-to-react'
 import { PiHandsClappingThin } from 'react-icons/pi'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
+import Button from '@/components/forms/Button'
 
 const SingleBlogPage = () => {
   const params = useParams()
@@ -19,6 +24,7 @@ const SingleBlogPage = () => {
 
   const [loading, setLoading] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
+  const [content, setContent] = useState('')
 
   useEffect(() => {
     setLikesCount(data?.blog.likesCount)
@@ -41,10 +47,21 @@ const SingleBlogPage = () => {
     }
   }
 
+  const mutation = useMutation({
+    mutationKey: ['create-comment'],
+    mutationFn: value => addComment(value, params.blogId),
+    onSuccess: () => {
+      toast.success('Comment added successfully!')
+    },
+    onError: error => {
+      toast.error(error)
+    },
+  })
+
   return (
     <div>
       <Header />
-      <div className='mt-[90px] w-[80%] mx-auto space-y-5'>
+      <div className='mt-[90px] w-[80%] mx-auto space-y-5 mb-10'>
         {isLoading ? (
           <>Loading</>
         ) : (
@@ -87,6 +104,25 @@ const SingleBlogPage = () => {
             {Parser().parse(data.blog.content)}
           </div>
         )}
+
+        <div className='w-[80%]'>
+          <h1>Comments</h1>
+
+          {/* Fetch comments */}
+
+          <textarea
+            onChange={e => setContent(e.target.value)}
+            placeholder='Write a comment'
+            className='bg-gray-100 my-3 p-2 text-sm focus-visible:outline-none w-[50%] resize-none h-[100px]'></textarea>
+          <Button
+            className='px-3'
+            onClick={() => {
+              mutation.mutate(content)
+              setContent('')
+            }}>
+            Create
+          </Button>
+        </div>
       </div>
     </div>
   )

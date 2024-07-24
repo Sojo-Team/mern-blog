@@ -49,3 +49,14 @@ export const addLiketoBlog = async id => {
     }
   }
 }
+
+export const addComment = async (content, id) => {
+  try {
+    const response = await api.put(`/blog/comment/${id}`, { content })
+    return response.data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw error.response.data.message
+    }
+  }
+}
