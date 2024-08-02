@@ -16,6 +16,7 @@ const SingleBlogPage = lazy(() => import('./pages/SingleBlogPage'))
 // Admin Pages
 const AdminCreateBlogPage = lazy(() => import('./pages/admin/CreateBlogPage'))
 const AdminPublishBlogPage = lazy(() => import('./pages/admin/PublishBlogPage'))
+const AdminEditBlogPage = lazy(() => import('./pages/admin/EditBlogPage'))
 // const AdminEditBlogPage = lazy(() => import('./pages/admin/EditBlogPage'))
 // const AdminBlogsPage = lazy(() => import('./pages/admin/BlogsPage'))
 
@@ -64,6 +65,10 @@ const App = () => {
             <Route
               path='publish'
               element={<AdminPublishBlogPage />}
+            />
+            <Route
+              path='edit/:blogId'
+              element={<AdminEditBlogPage />}
             />
           </Route>
         </Routes>

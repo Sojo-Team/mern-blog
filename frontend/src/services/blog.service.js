@@ -60,3 +60,14 @@ export const addComment = async (content, id) => {
     }
   }
 }
+
+export const editBlogService = async (value, id) => {
+  try {
+    const response = await api.put(`/blog/${id}`, value)
+    return response.data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw error.response.data.message
+    }
+  }
+}
